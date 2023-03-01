@@ -1,9 +1,11 @@
 package gText
 
 import (
+	"encoding/binary"
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 )
 
 func Int642Str(i int64) string {
@@ -32,6 +34,22 @@ func Float642Float64(f float64, w string) float64 {
 	f, _ = strconv.ParseFloat(fmt.Sprintf("%."+w+"f", f), 64)
 	return f
 }
+func Byte2Int(b []byte) uint32 {
+	return binary.LittleEndian.Uint32(b)
+}
+func Between(str, starting, ending string) string {
+	s := strings.Index(str, starting)
+	if s < 0 {
+		return ""
+	}
+	s += len(starting)
+	e := strings.Index(str[s:], ending)
+	if e < 0 {
+		return ""
+	}
+	return str[s : s+e]
+}
+
 func Test() {
 	s, _ := Str2Int64("320")
 	log.Printf(`Str2Int64("320") %s`, s)
@@ -43,4 +61,5 @@ func Test() {
 	log.Printf(`Str2Int("320") %s`, i)
 	log.Printf(`Int2Str(320) %s`, Int2Str(i))
 	log.Printf(`Float642Float64(1725577.59 - 1381341.21 ,"2") %s`, Float642Float64(1725577.59-1381341.21, "2"))
+	log.Printf(`Byte2Int([]byte{8, 0, 0, 0} %s`, Byte2Int([]byte{8, 0, 0, 0}))
 }
