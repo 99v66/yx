@@ -2,10 +2,10 @@ package gHttp
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	glog "yxProject/log"
 )
 
 func POST(url, data string) (string, error) {
@@ -78,11 +78,28 @@ func GETV2(url string, data []byte, heads map[string]string, Proxy string) ([]by
 	}
 	defer resp.Body.Close() //关闭请求
 	//读取返回包体
+
 	body, err := ioutil.ReadAll(resp.Body)
 	return body, err
 }
 func Test() {
-	s, e := POST("https://oapi.dingtalk.com/robot/send?access_token=91457c1c4fa1bad1f03f951382558e814f5f729f7d87b5f3741ebdaff2cb96b2", "aaaa")
-	fmt.Println(s)
-	fmt.Println(e)
+	//s, e := POST("https://oapi.dingtalk.com/robot/send?access_token=91457c1c4fa1bad1f03f951382558e814f5f729f7d87b5f3741ebdaff2cb96b2", "aaaa")
+	//fmt.Println(s)
+	//fmt.Println(e)
+	hp := &YxHttp{}
+	o := &YxHttpObj{Url: "https://twitter.com/i/lists/1449337936890191872", Proxy: "http://127.0.0.1:7890"}
+	err := hp.Send("get", o)
+	if err != nil {
+		glog.Log().Info().Err(err).Msg("创建请求失败")
+		return
+	}
+	byte, err := hp.GetBody()
+	glog.Log().Info().Bytes("响应数据", byte).Err(err).Send()
+	glog.Log().Info().Str("Cookie", hp.GetAllCookie()).Send()
+	glog.Log().Info().Str("Heads", hp.GetHeads("x-connection-hash")).Send()
+	list := hp.GetAllCookieAarr()
+	glog.Log().Info().Any("GetAllCookieAarr", list).Send()
+	glog.Log().Info().Any("GetAllCookieAarr", hp.Cookie2Map(list)).Send()
+	glog.Log().Info().Str("gt", hp.Cookie2Map(list)["gt"]).Send()
+	hp.Close()
 }
